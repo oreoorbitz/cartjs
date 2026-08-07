@@ -82,9 +82,8 @@ describe('Tinybind Drop-in', function() {
 
   describe('each binder index compatibility', function() {
     it("$index is available in tinybind each", function() {
-      // Tinybind uses $index, Rivets used index
-      // Our plan shims index if needed; check that at least $index path does not throw
-      (typeof tinybind.binders['each'] !== 'undefined').should.equal(true);
+      // Tinybind uses $index and each-* binder (not each)
+      (typeof tinybind.binders['each-*'] !== 'undefined').should.equal(true);
     });
   });
 

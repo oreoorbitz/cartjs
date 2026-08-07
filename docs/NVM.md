@@ -9,7 +9,11 @@ Content of `.nvmrc`:
 24.19.0
 ```
 
-Related config: `.tool-versions` (asdf) also pins `nodejs 24.19.0` and `python 3.9.6`.
+Related config: `.tool-versions` (asdf) also pins `nodejs 24.19.0` and `python 3.9.6`, `.node-version` mirrors `.nvmrc` for `fnm`/`volta`, and `package.json` `engines: >=22.12.0` with `engineStrict` enforces it on `npm install`.
+
+Build source of truth is `vite.config.mjs` (`npm run build`); `Gruntfile.coffee` is deprecated. Tests run via `vitest` (`npm test`, 28 tests, `vitest.config.mjs`); lint via `npm run lint` (`eslint`) and `npm run format` (`prettier --check`). CI runs on `24.19.0` via `.github/workflows/ci.yml`.
+
+Plain `npm install` now works (lockfile is v3); the old `NPM_CONFIG_CACHE=/tmp/npm-cache-adhoc` workaround is no longer needed (kept in `docs/THEME_TEST.md` for reference).
 
 ## Why this matters
 

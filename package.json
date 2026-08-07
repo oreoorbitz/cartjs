@@ -15,6 +15,10 @@
     "type": "git",
     "url": "https://github.com/discolabs/cartjs.git"
   },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "engineStrict": true,
   "scripts": {
     "test": "vitest run",
     "test:grunt": "grunt test",
@@ -22,6 +26,11 @@
     "build": "vite build",
     "build:grunt": "grunt build",
     "watch": "vite build --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "ci": "npm run lint && npm run format && npm run build && npm test",
     "docs": "grunt docs",
     "theme:init": "shopify theme init theme-test --clone-url=https://github.com/Shopify/dawn --path=theme-test || shopify theme init theme-test",
     "theme:assets": "node scripts/sync-theme-assets.js",
@@ -32,6 +41,8 @@
   "devDependencies": {
     "@shopify/cli": "^4.6.1",
     "decaffeinate": "^8.1.4",
+    "eslint": "^9.39.5",
+    "globals": "^15.15.0",
     "grunt": "^1.6.3",
     "grunt-cli": "^1.5.0",
     "grunt-contrib-clean": "^2.0.1",
@@ -49,6 +60,7 @@
     "jquery": "^4.0.0",
     "jsdom": "^27.0.1",
     "mocha": "^11.8.0",
+    "prettier": "^3.9.6",
     "rivets": "^0.9.6",
     "shopify.i18n.js": "~0.2.1",
     "should": "^13.2.3",

@@ -11,24 +11,20 @@
 // -----------------------------------------------------------------
 
 // Resolve binding engine — prefer tinybind, fallback to rivets
-let rivets, tinybind;
+// Fix decaffeinate shadow: check window.* not local let
 let _bindingEngine = null;
-if ((typeof tinybind !== "undefined") && (tinybind != null)) {
-  _bindingEngine = tinybind;
-  // Alias for legacy themes that reference window.rivets
-  if ((typeof rivets === "undefined") || (rivets == null)) { window.rivets = tinybind; }
-} else if ((typeof rivets !== "undefined") && (rivets != null)) {
-  _bindingEngine = rivets;
-  // Alias for new code that references tinybind
-  if ((typeof tinybind === "undefined") || (tinybind == null)) { window.tinybind = rivets; }
+if (typeof window !== "undefined" && window.tinybind != null) {
+  _bindingEngine = window.tinybind;
+  if (typeof window.rivets === "undefined" || window.rivets == null) { window.rivets = window.tinybind; }
+} else if (typeof window !== "undefined" && window.rivets != null) {
+  _bindingEngine = window.rivets;
+  if (typeof window.tinybind === "undefined" || window.tinybind == null) { window.tinybind = window.rivets; }
 }
 
 // Ensure both globals point to same object for drop-in (strict ===)
 if (_bindingEngine != null) {
   window.rivets = _bindingEngine;
   window.tinybind = _bindingEngine;
-  rivets = _bindingEngine;
-  tinybind = _bindingEngine;
 }
 
 if (_bindingEngine != null) {
@@ -89,11 +85,11 @@ if (_bindingEngine != null) {
   const _registerFormatter = function(name, fn) {
     _bindingEngine.formatters[name] = fn;
     // Keep rivets/tinybind in sync if they are separate objects (should be ===, but be safe)
-    if ((typeof rivets !== "undefined") && (rivets != null) && (rivets !== _bindingEngine)) {
-      rivets.formatters[name] = fn;
+    if (typeof window !== "undefined" && window.rivets != null && window.rivets !== _bindingEngine) {
+      window.rivets.formatters[name] = fn;
     }
-    if ((typeof tinybind !== "undefined") && (tinybind != null) && (tinybind !== _bindingEngine)) {
-      return tinybind.formatters[name] = fn;
+    if (typeof window !== "undefined" && window.tinybind != null && window.tinybind !== _bindingEngine) {
+      return window.tinybind.formatters[name] = fn;
     }
   };
 

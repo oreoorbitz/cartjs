@@ -57,4 +57,14 @@ if (typeof exports === 'object') {
   });
 } else {
   CartJS.factory(this.CartJS = {});
+  // Preserve full namespace on window.CartJS for drop-in tests
+  if (typeof window !== "undefined" && window.CartJS) {
+    window.CartJS.Core = CartJS.Core;
+    window.CartJS.Data = CartJS.Data;
+    window.CartJS.Rivets = CartJS.Rivets;
+    window.CartJS.Utils = CartJS.Utils;
+    window.CartJS.Queue = CartJS.Queue;
+    if (typeof Cart !== "undefined") window.CartJS.Cart = Cart;
+    if (typeof Item !== "undefined") window.CartJS.Item = Item;
+  }
 }

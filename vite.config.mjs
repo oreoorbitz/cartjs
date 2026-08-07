@@ -79,16 +79,19 @@ const cartjsPlugin = {
 };
 
 export default {
-  // We keep Vite's own build minimal — our plugin does the real work
+  // We keep Vite's own build minimal — our plugin does the real work via closeBundle
+  // No dummy lib entry needed — we use a virtual input to avoid empty chunk
   build: {
     outDir: 'dist',
     emptyOutDir: false,
-    // Dummy lib entry — our plugin handles the real concat in closeBundle
-    lib: {
-      entry: 'src/cart.js',
-      name: 'CartJSDummy',
-      formats: ['es'],
-      fileName: () => 'dummy.js'
+    // Use a tiny virtual entry to satisfy Vite without emitting a dummy file
+    rollupOptions: {
+      input: 'src/cart.js',
+      output: {
+        entryFileNames: 'dummy.js',
+        chunkFileNames: 'dummy-[name].js',
+        assetFileNames: 'dummy-[name].[ext]'
+      }
     },
     minify: false,
     write: true

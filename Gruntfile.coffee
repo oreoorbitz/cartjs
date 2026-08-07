@@ -1,3 +1,5 @@
+# DEPRECATED — use `npm run build` (Vite). Kept for one release as `npm run build:grunt` fallback.
+# See plans/005-vite-build-plan.md and vite.config.mjs.
 module.exports = (grunt) ->
 
   # Initialise

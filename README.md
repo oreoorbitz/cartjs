@@ -1,5 +1,21 @@
 [![npm version](https://badge.fury.io/js/shopify-cartjs.svg)](https://badge.fury.io/js/shopify-cartjs)
-[![Bower version](https://badge.fury.io/bo/shopify-cartjs.svg)](https://badge.fury.io/bo/shopify-cartjs)
+
+# Cart.js (oreoorbitz fork — modernized)
+
+> **Node 24.19.0** via `.nvmrc` / `.node-version` / `scripts/use-nvmrc.sh`. Shopify CLI `>=22.12.0` and Mepto `24.x` require it. See `docs/NVM.md`.
+
+## Quick start (modern)
+
+```bash
+./scripts/use-nvmrc.sh  # or nvm use / asdf install
+npm ci
+npm run build   # Vite → dist/cart.js + dist/rivets-cart.js (IIFE, banner frozen)
+npm test        # Vitest (happy-dom) — 28 tests
+npm run lint && npm run format
+npm run theme:check  # offline Liquid check (no store); theme:dev needs Partner store — see docs/THEME_TEST.md
+```
+
+Build source of truth is `vite.config.mjs`; `Gruntfile.coffee` is deprecated (`npm run build:grunt` fallback for one release). No Bower.
 
 # Cart.js
 Cart.js is a Javascript library that makes it easy to add dynamic cart features
