@@ -16,8 +16,11 @@
     "url": "https://github.com/discolabs/cartjs.git"
   },
   "scripts": {
-    "test": "grunt test",
-    "build": "grunt build",
+    "test": "vitest run",
+    "test:grunt": "grunt test",
+    "build": "vite build",
+    "build:grunt": "grunt build",
+    "watch": "vite build --watch",
     "docs": "grunt docs"
   },
   "devDependencies": {
@@ -43,6 +46,7 @@
     "shopify.i18n.js": "~0.2.1",
     "should": "^13.2.3",
     "sightglass": "^0.2.6",
+    "vite": "^6.4.3",
     "vitest": "^4.1.10"
   },
   "overrides": {

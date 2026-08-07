@@ -68,7 +68,8 @@
     }
   }
 })();
-;/*
+;
+/*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
  * DS102: Remove unnecessary code created because of implicit returns
@@ -97,7 +98,8 @@ class Cart {
     return this.items = (Array.from(cart.items).map((item) => new Item(item)));
   }
 }
-;/*
+;
+/*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
  * DS205: Consider reworking code to avoid use of IIFEs
@@ -143,7 +145,8 @@ class Item {
     })();
   }
 }
-;/*
+;
+/*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
  * DS207: Consider shorter variations of null checks
@@ -224,7 +227,8 @@ if (window.console == null) {
   window.console = {};
   window.console.log = function() {};
 }
-;/*
+;
+/*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
  * DS102: Remove unnecessary code created because of implicit returns
@@ -386,7 +390,8 @@ CartJS.Utils = {
       if (src) { return src; } else { return 'https://cdn.shopify.com/s/images/admin/no-image-large.gif'; }
     }
   }
-};;/*
+};;
+/*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
  * DS207: Consider shorter variations of null checks
@@ -446,7 +451,8 @@ CartJS.Queue = {
     return jQuery.ajax(params);
   }
 };
-;/*
+;
+/*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
  * DS207: Consider shorter variations of null checks
@@ -590,7 +596,8 @@ CartJS.Core = {
     return CartJS.Queue.add('/cart/update.js', { note }, options);
   }
 };
-;/*
+;
+/*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
  * DS207: Consider shorter variations of null checks
@@ -739,7 +746,8 @@ CartJS.Data = {
       return $this.html(context[$this.attr('data-cart-render')]);});
   }
 };
-;/*
+;
+/*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
  * DS102: Remove unnecessary code created because of implicit returns
@@ -925,7 +933,8 @@ if (_bindingEngine != null) {
     destroy() {}
   };
 }
-;/*
+;
+/*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
  * DS208: Avoid top-level this
