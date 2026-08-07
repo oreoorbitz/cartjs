@@ -11,24 +11,24 @@ module.exports = (grunt) ->
         '// author: <%= pkg.author %>\n' +
         '// license: <%= pkg.licenses[0].type %>\n'
 
-    coffee:
-      build:
+    concat:
+      build_js:
         options:
-          join: true
+          banner: '<%= meta.banner %>(function() {\n'
+          footer: '\n}).call(typeof window !== "undefined" ? window : this);'
+          separator: ';'
         files:
           'dist/cart.js': [
-            'src/cart.coffee'
-            'src/item.coffee'
-            'src/cartjs.coffee'
-            'src/utils.coffee'
-            'src/queue.coffee'
-            'src/core.coffee'
-            'src/data.coffee'
-            'src/rivets.coffee'
-            'src/export.coffee'
+            'src/cart.js'
+            'src/item.js'
+            'src/cartjs.js'
+            'src/utils.js'
+            'src/queue.js'
+            'src/core.js'
+            'src/data.js'
+            'src/rivets.js'
+            'src/export.js'
           ]
-
-    concat:
       build:
         options:
           banner: '<%= meta.banner %>'
@@ -99,7 +99,7 @@ module.exports = (grunt) ->
 
     watch:
       build:
-        files: 'src/*.coffee'
+        files: 'src/*.js'
         tasks: ['build']
       docs:
         files: 'docs/**/*.less'
@@ -120,6 +120,6 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-mocha-phantomjs'
 
   grunt.registerTask 'default', ['watch']
-  grunt.registerTask 'build',   ['coffee:build', 'concat:build', 'uglify:build', 'clean:build']
+  grunt.registerTask 'build',   ['concat:build_js', 'concat:build', 'uglify:build', 'clean:build']
   grunt.registerTask 'test',    ['build', 'mocha_phantomjs']
   grunt.registerTask 'docs',    ['build', 'terraform:docs', 'compress:docs', 'copy:docs', 'less:docs']
