@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ page_title }} — {{ shop.name }}</title>
+  {{ content_for_header }}
+  {{ 'cart.min.js' | asset_url | script_tag }}
+</head>
+<body>
+  <main id="content">
+    {{ content_for_layout }}
+  </main>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.CartJS) {
+        console.log('CartJS loaded', CartJS.version);
+      } else {
+        console.error('CartJS not loaded');
+      }
+    });
+  </script>
+</body>
+</html>

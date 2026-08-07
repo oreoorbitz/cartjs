@@ -1,0 +1,29 @@
+<h1>CartJS Theme Test</h1>
+<p>This fixture tests <code>dist/cart.js</code> as a drop-in Shopify theme asset.</p>
+
+<div data-cart-view>
+  <p>Items in cart: <span data-cart-render="itemCount"></span></p>
+  <ul>
+    <li data-cart-each="item in cart.items">
+      <span data-cart-text="item.product_title"></span>
+      × <span data-cart-text="item.quantity"></span>
+    </li>
+  </ul>
+</div>
+
+<form data-cart-submit>
+  <input type="hidden" name="id" value="12345678">
+  <input type="hidden" name="quantity" value="1">
+  <button type="submit" data-cart-add="12345678">Add test item</button>
+</form>
+
+<button data-cart-clear>Clear cart</button>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (window.CartJS) {
+      CartJS.init({ moneyWithCurrencyFormat: "${{amount}} USD" });
+      console.log('CartJS.init done', CartJS.cart);
+    }
+  });
+</script>

@@ -18,12 +18,19 @@
   "scripts": {
     "test": "vitest run",
     "test:grunt": "grunt test",
+    "test:theme": "npm run theme:check",
     "build": "vite build",
     "build:grunt": "grunt build",
     "watch": "vite build --watch",
-    "docs": "grunt docs"
+    "docs": "grunt docs",
+    "theme:init": "shopify theme init theme-test --clone-url=https://github.com/Shopify/dawn --path=theme-test || shopify theme init theme-test",
+    "theme:assets": "node scripts/sync-theme-assets.js",
+    "theme:check": "npm run build && npm run theme:assets && shopify theme check theme-test",
+    "theme:dev": "npm run build && npm run theme:assets && shopify theme dev --path=theme-test",
+    "theme:push": "npm run build && npm run theme:assets && shopify theme push --path=theme-test --unpublished --json"
   },
   "devDependencies": {
+    "@shopify/cli": "^4.6.1",
     "decaffeinate": "^8.1.4",
     "grunt": "^1.6.3",
     "grunt-cli": "^1.5.0",
