@@ -2,7 +2,7 @@
   // CartJS.Cart
   // Wraps a normal cart JSON object to provide additional functionality.
   // ---------------------
-  var $document, Cart, CartJS, FORMAT_MONEY_WARNING, Item, processing, queue,
+  var $document, Cart, CartJS, FORMAT_MONEY_WARNING, Item, _bindingEngine, _registerFormatter, processing, queue, rivets, tinybind,
     indexOf = [].indexOf;
 
   Cart = class Cart {
@@ -610,14 +610,41 @@
   };
 
   // CartJS.Rivets
-  // Adds Rivets.js functionality to CartJS if Rivets.js is available.
+  // Adds Rivets.js / Tinybind functionality to CartJS if available.
+  // Drop-in: supports both rivets (0.9.6) and tinybind (1.0.0) via alias.
   // -----------------------------------------------------------------
-  if (typeof rivets !== "undefined" && rivets !== null) {
-    // Rivets.js has been loaded, so declare the CartJS.Rivets module.
+
+  // Resolve binding engine — prefer tinybind, fallback to rivets
+  _bindingEngine = null;
+
+  if (typeof tinybind !== "undefined" && (typeof tinybind !== "undefined" && tinybind !== null)) {
+    _bindingEngine = tinybind;
+    if (typeof rivets === "undefined" || (typeof rivets === "undefined" || rivets === null)) {
+      // Alias for legacy themes that reference window.rivets
+      window.rivets = tinybind;
+    }
+  } else if (typeof rivets !== "undefined" && (typeof rivets !== "undefined" && rivets !== null)) {
+    _bindingEngine = rivets;
+    if (typeof tinybind === "undefined" || (typeof tinybind === "undefined" || tinybind === null)) {
+      // Alias for new code that references tinybind
+      window.tinybind = rivets;
+    }
+  }
+
+  // Ensure both globals point to same object for drop-in (strict ===)
+  if (_bindingEngine != null) {
+    window.rivets = _bindingEngine;
+    window.tinybind = _bindingEngine;
+    rivets = _bindingEngine;
+    tinybind = _bindingEngine;
+  }
+
+  if (_bindingEngine != null) {
+    // Rivets.js / Tinybind has been loaded, so declare the CartJS.Rivets module.
     CartJS.Rivets = {
       // Maintain a reference to the base model object so that we can reference it later.
       model: null,
-      // Maintain a list of all bound Rivets.js views so that we can unbind later if needed.
+      // Maintain a list of all bound views so that we can unbind later if needed.
       boundViews: [],
       // Initialise the Rivets module.
       init: function() {
@@ -629,7 +656,7 @@
       },
       // Bind all Rivets.js view elements that are currently present on the page.
       bindViews: function() {
-        CartJS.Utils.log('Rivets.js is present, binding views.');
+        CartJS.Utils.log('Rivets.js/Tinybind is present, binding views.');
         // Unbind any currently bound views.
         CartJS.Rivets.unbindViews();
         // Merge a new models object with any specified in the settings.
@@ -637,18 +664,17 @@
           cart: CartJS.cart
         }, CartJS.settings.rivetsModels);
         // If Shopify's Currency global object is available, add it to the data model.
-        // Done so that we can observer Currency.currentCurrency for changes.
         if (window.Currency != null) {
           CartJS.Rivets.model.Currency = window.Currency;
         }
-        // Iterate through and bind all elements marked as Rivets.js views via the [data-cart-view] attribute.
+        // Iterate through and bind all elements marked as views via the [data-cart-view] attribute.
         return jQuery('[data-cart-view]').each(function() {
           var view;
-          view = rivets.bind(jQuery(this), CartJS.Rivets.model);
+          view = _bindingEngine.bind(jQuery(this), CartJS.Rivets.model);
           return CartJS.Rivets.boundViews.push(view);
         });
       },
-      // Unbind all currently bound Rivets.js views.
+      // Unbind all currently bound views.
       unbindViews: function() {
         var j, len, ref, view;
         ref = CartJS.Rivets.boundViews;
@@ -659,53 +685,63 @@
         return CartJS.Rivets.boundViews = [];
       }
     };
-    // Add useful general-purpose formatters for Rivets.js
-    rivets.formatters.eq = function(a, b) {
+    // Add useful general-purpose formatters (register on both globals for drop-in)
+    _registerFormatter = function(name, fn) {
+      _bindingEngine.formatters[name] = fn;
+      // Keep rivets/tinybind in sync if they are separate objects (should be ===, but be safe)
+      if (typeof rivets !== "undefined" && (rivets != null) && rivets !== _bindingEngine) {
+        rivets.formatters[name] = fn;
+      }
+      if (typeof tinybind !== "undefined" && (tinybind != null) && tinybind !== _bindingEngine) {
+        return tinybind.formatters[name] = fn;
+      }
+    };
+    _registerFormatter('eq', function(a, b) {
       return a === b;
-    };
-    rivets.formatters.includes = function(a, b) {
+    });
+    _registerFormatter('includes', function(a, b) {
       return a.indexOf(b) >= 0;
-    };
-    rivets.formatters.match = function(a, regexp, flags) {
+    });
+    _registerFormatter('match', function(a, regexp, flags) {
       return a.match(new RegExp(regexp, flags));
-    };
-    rivets.formatters.lt = function(a, b) {
+    });
+    _registerFormatter('lt', function(a, b) {
       return a < b;
-    };
-    rivets.formatters.gt = function(a, b) {
+    });
+    _registerFormatter('gt', function(a, b) {
       return a > b;
-    };
-    rivets.formatters.not = function(a) {
+    });
+    _registerFormatter('not', function(a) {
       return !a;
-    };
-    rivets.formatters.empty = function(a) {
+    });
+    _registerFormatter('empty', function(a) {
       return !a.length;
-    };
-    rivets.formatters.plus = function(a, b) {
+    });
+    _registerFormatter('plus', function(a, b) {
       return parseInt(a) + parseInt(b);
-    };
-    rivets.formatters.minus = function(a, b) {
+    });
+    _registerFormatter('minus', function(a, b) {
       return parseInt(a) - parseInt(b);
-    };
-    rivets.formatters.times = function(a, b) {
+    });
+    _registerFormatter('times', function(a, b) {
       return a * b;
-    };
-    rivets.formatters.divided_by = function(a, b) {
+    });
+    _registerFormatter('divided_by', function(a, b) {
       return a / b;
-    };
-    rivets.formatters.modulo = function(a, b) {
+    });
+    _registerFormatter('modulo', function(a, b) {
       return a % b;
-    };
-    rivets.formatters.prepend = function(a, b) {
+    });
+    _registerFormatter('prepend', function(a, b) {
       return b + a;
-    };
-    rivets.formatters.append = function(a, b) {
+    });
+    _registerFormatter('append', function(a, b) {
       return a + b;
-    };
-    rivets.formatters.slice = function(value, start, end) {
+    });
+    _registerFormatter('slice', function(value, start, end) {
       return value.slice(start, end);
-    };
-    rivets.formatters.pluralize = function(input, singular, plural = singular + 's') {
+    });
+    _registerFormatter('pluralize', function(input, singular, plural = singular + 's') {
       if (CartJS.Utils.isArray(input)) {
         input = input.length;
       }
@@ -714,24 +750,24 @@
       } else {
         return plural;
       }
-    };
-    rivets.formatters.array_element = function(array, index) {
+    });
+    _registerFormatter('array_element', function(array, index) {
       return array[index];
-    };
-    rivets.formatters.array_first = function(array) {
+    });
+    _registerFormatter('array_first', function(array) {
       return array[0];
-    };
-    rivets.formatters.array_last = function(array) {
+    });
+    _registerFormatter('array_last', function(array) {
       return array[array.length - 1];
-    };
-    // Add Shopify-specific formatters for Rivets.js.
-    rivets.formatters.money = function(value, currency) {
+    });
+    // Add Shopify-specific formatters
+    _registerFormatter('money', function(value, currency) {
       return CartJS.Utils.formatMoney(value, CartJS.settings.moneyFormat, 'money_format', currency);
-    };
-    rivets.formatters.money_with_currency = function(value, currency) {
+    });
+    _registerFormatter('money_with_currency', function(value, currency) {
       return CartJS.Utils.formatMoney(value, CartJS.settings.moneyWithCurrencyFormat, 'money_with_currency_format', currency);
-    };
-    rivets.formatters.weight = function(grams) {
+    });
+    _registerFormatter('weight', function(grams) {
       switch (CartJS.settings.weightUnit) {
         case 'kg':
           return (grams / 1000).toFixed(CartJS.settings.weightPrecision);
@@ -742,19 +778,31 @@
         default:
           return grams.toFixed(CartJS.settings.weightPrecision);
       }
-    };
-    rivets.formatters.weight_with_unit = function(grams) {
-      return rivets.formatters.weight(grams) + CartJS.settings.weightUnit;
-    };
-    rivets.formatters.product_image_size = function(src, size) {
+    });
+    _registerFormatter('weight_with_unit', function(grams) {
+      return _bindingEngine.formatters.weight(grams) + CartJS.settings.weightUnit;
+    });
+    _registerFormatter('product_image_size', function(src, size) {
       return CartJS.Utils.getSizedImageUrl(src, size);
-    };
+    });
     // Add camelCase aliases for underscore formatters.
-    rivets.formatters.moneyWithCurrency = rivets.formatters.money_with_currency;
-    rivets.formatters.weightWithUnit = rivets.formatters.weight_with_unit;
-    rivets.formatters.productImageSize = rivets.formatters.product_image_size;
+    _registerFormatter('moneyWithCurrency', _bindingEngine.formatters.money_with_currency);
+    _registerFormatter('weightWithUnit', _bindingEngine.formatters.weight_with_unit);
+    _registerFormatter('productImageSize', _bindingEngine.formatters.product_image_size);
+    // Tinybind compatibility shims for Rivets drop-in
+    // 1. index → $index (Tinybind uses $index, Rivets used index)
+    // Provide formatter alias so {index} still works if Tinybind provides $index
+    if ((_bindingEngine.formatters['$index'] != null) && (_bindingEngine.formatters['index'] == null)) {
+      _registerFormatter('index', function(value) {
+        return value;
+      });
+    }
+    // 2. unless binder was removed in Tinybind — shim via if+not is documented, but provide alias binder if needed
+    if ((_bindingEngine.binders != null) && (_bindingEngine.binders['unless'] == null) && (_bindingEngine.binders['if'] != null)) {
+      _bindingEngine.binders['unless'] = _bindingEngine.binders['if'];
+    }
   } else {
-    // Rivets.js has not been loaded, so just declare a no-operation CartJS.Rivets module.
+    // Rivets.js / Tinybind has not been loaded, so just declare a no-operation CartJS.Rivets module.
     CartJS.Rivets = {
       init: function() {},
       destroy: function() {}
