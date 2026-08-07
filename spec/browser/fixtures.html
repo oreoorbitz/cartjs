@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>CartJS Browser Fixture</title>
+  </head>
+  <body>
+    <div data-cart-view>{cart.item_count} item(s) — {cart.total_price | money}</div>
+    <form data-cart-submit>
+      <input type="hidden" name="id" value="12345678">
+      <button type="submit" data-cart-add="12345678">Add</button>
+    </form>
+    <!-- Loaded by setup.browser.js via script injection; keep this file static for LLM debugging -->
+    <script>window.__CARTJS_FIXTURE_LOADED = true;</script>
+  </body>
+</html>
