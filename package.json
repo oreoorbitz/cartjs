@@ -56,6 +56,7 @@
     "serialize-javascript": "^7.0.3"
   },
   "dependencies": {
+    "meptos": "^2.0.0",
     "tinybind": "1.0.0"
   }
 }

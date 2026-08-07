@@ -19,6 +19,7 @@ module.exports = (grunt) ->
           separator: ';'
         files:
           'dist/cart.js': [
+            'src/mepto-adapter.js'
             'src/cart.js'
             'src/item.js'
             'src/cartjs.js'

@@ -20,7 +20,11 @@
     <script src="shopify/currencies.js"></script>
 
     <!-- Cart.js dependencies and Cart.js libary. -->
-    <script src="../node_modules/jquery/dist/jquery.js"></script>
+    <!-- Mepto drop-in: prefers Mepto (meptos) with jQuery fallback, all three globals === -->
+    <script src="../node_modules/meptos/dist/meptos.umd.cjs"></script>
+    <script>window.jQuery = window.$ = window.mepto;</script>
+    <!-- Legacy jQuery kept for one release for drop-in verification (remove after) -->
+    <!-- <script src="../node_modules/jquery/dist/jquery.js"></script> -->
     <!-- Tinybind drop-in: bundles sightglass internally, keep rivets alias for legacy themes -->
     <script src="../node_modules/tinybind/dist/tinybind.js"></script>
     <script>window.rivets = window.tinybind; window.tinybind = window.rivets;</script>
