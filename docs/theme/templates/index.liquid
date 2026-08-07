@@ -1,4 +1,5 @@
-{% include 'variables' %}<section class="jumbotron jumbotron-primary"><div class="container text-center"><h3>A Javascript library to power your Shopify theme's cart.</h3><a href="{{ 'cartjs.zip' | asset_url }}" class="btn btn-lg btn-outline-inverse">Download Cart.js v{{ version }}</a></div></section><section class="jumbotron"><div class="container"><div class="row"><div class="col-md-8 col-md-offset-2"><h2>What is Cart.js?</h2><p>Cart.js is a very small open source Javascript library that makes the addition of powerful Ajax cart functionality to your Shopify theme a breeze.</p>
+{% include 'variables' %}<section class="jumbotron jumbotron-primary"><div class="container text-center"><h3>A Javascript library to power your Shopify theme's cart.</h3><a href="{{ 'cartjs.zip' | asset_url }}" class="btn btn-lg btn-outline-inverse">Download Cart.js v{{ version }}</a></div></section><section class="jumbotron"><div class="container"><div class="row"><div class="col-md-8 col-md-offset-2"><h2 id="what-is-cartjs">What is Cart.js?</h2>
+<p>Cart.js is a very small open source Javascript library that makes the addition of powerful Ajax cart functionality to your Shopify theme a breeze.</p>
 <p>It&#39;s designed to be simple to use, while providing some really powerful and nifty features, like:</p>
 <ul>
 <li><strong>Simple, consistent API</strong> for cart manipulation;</li>
@@ -24,7 +25,8 @@ items in your cart for a total of
 &lt;button data-cart-add=&quot;716986707&quot; data-cart-quantity=&quot;2&quot;&gt;Add 2 Coats&lt;/button&gt;
 &lt;button data-cart-clear&gt;Clear&lt;/button&gt;
 </code></pre>
-</div><div class="example-footer"><a data-toggle="collapse" href="#demo-simple-code">Show markup for this example</a></div></div></div><div class="row"><div class="col-md-8 col-md-offset-2"><h2>Can it do more?</h2><p>Yes!
+</div><div class="example-footer"><a data-toggle="collapse" href="#demo-simple-code">Show markup for this example</a></div></div></div><div class="row"><div class="col-md-8 col-md-offset-2"><h2 id="can-it-do-more">Can it do more?</h2>
+<p>Yes!
 There&#39;s a whole lot more to Cart.js, from converting your existing product forms to Ajax with a single attribute to fully dynamic HTML template support.</p>
 <p>And if you ever want to write your own Javascript directly, you can hook in to our custom events and API.</p>
 <p>You can start learning about Cart.js with the <a href="/pages/guide">guide</a>, or check out the full <a href="/pages/reference">reference</a>.</p>
@@ -96,7 +98,9 @@ There&#39;s a whole lot more to Cart.js, from converting your existing product f
 
 &lt;img src=&quot;loader.gif&quot; width=&quot;16&quot; height=&quot;11&quot; class=&quot;cart-visible-loading&quot;/&gt;
 </code></pre>
-</div><div class="example-footer"><a data-toggle="collapse" href="#demo-advanced-code">Show markup for this example</a></div></div></div><div class="row"><div class="col-md-8 col-md-offset-2"><h2>Further Questions</h2><h3>Is it stable?</h3><p>Cart.js is one of the most widely used front end Shopify libraries. It&#39;s being
+</div><div class="example-footer"><a data-toggle="collapse" href="#demo-advanced-code">Show markup for this example</a></div></div></div><div class="row"><div class="col-md-8 col-md-offset-2"><h2 id="further-questions">Further Questions</h2>
+<h3 id="is-it-stable">Is it stable?</h3>
+<p>Cart.js is one of the most widely used front end Shopify libraries. It&#39;s being
 used in production by a vast number of Shopify stores, including our own
 clients.</p>
 <p>While it doesn&#39;t receive frequent updates, it is generally maintained and we do
@@ -104,11 +108,13 @@ make the effort to respond to bug reports and feature requests in a timely
 manner.</p>
 <p>If you&#39;re interested in using Cart.js, we&#39;ll be happy to answer any questions 
 you have or help you get up and running.</p>
-<h3>Who&#39;s using it?</h3><p>Aside from our own clients (some of whom are running very sizable Shopify
+<h3 id="whos-using-it">Who&#39;s using it?</h3>
+<p>Aside from our own clients (some of whom are running very sizable Shopify
 stores), a number of other sites are using Cart.js in the wild. Check out the
 <a href="/pages/built-with-cart-js">Built with Cart.js</a> page for a list (don&#39;t forget to <a href="https://github.com/discolabs/cartjs/issues/new?title=New%20site%20for%20%22Built%20With%22%20Page:%20http://">add your own site</a>
 once you&#39;ve built something using the library).</p>
-<h3>What&#39;s the browser support like?</h3><p>Pretty good! Because the core Cart.js libraries use jQuery for Ajax requests
+<h3 id="whats-the-browser-support-like">What&#39;s the browser support like?</h3>
+<p>Pretty good! Because the core Cart.js libraries use jQuery for Ajax requests
 and DOM manipulation, the only limiting factor is the version of jQuery you
 decide to use. This means that themes using a <code>1.x</code> version of jQuery with
 Cart.js will be able to support IE6+, Chrome, Firefox, Safari 5.1+ and up.</p>
@@ -116,8 +122,10 @@ Cart.js will be able to support IE6+, Chrome, Firefox, Safari 5.1+ and up.</p>
 with older browser that don&#39;t support the ES5 Javascript standard (in practice,
 this means Internet Explorer 8 and below). See <a href="/pages/guide#getting-started-browser-support">Browser Support</a> in the Guide
 for more detail.</p>
-<h3>I have a bug report / feature request.</h3><p>Please add it to the <a href="https://github.com/discolabs/cartjs/issues">issues tracker</a> on GitHub.</p>
-<h3>Can I contribute?</h3><p>Absolutely!
+<h3 id="i-have-a-bug-report--feature-request">I have a bug report / feature request.</h3>
+<p>Please add it to the <a href="https://github.com/discolabs/cartjs/issues">issues tracker</a> on GitHub.</p>
+<h3 id="can-i-contribute">Can I contribute?</h3>
+<p>Absolutely!
 Just head to the <a href="https://github.com/discolabs/cartjs">GitHub</a> page, fork the repository and manage development 
 through issues and pull requests.</p>
 <p>If you&#39;re keen to help but don&#39;t know where to start, contact me

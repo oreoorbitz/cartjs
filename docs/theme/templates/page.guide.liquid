@@ -13,29 +13,35 @@ Then you can make calls to Cart.js from within your theme code.</p>
 <h3 id="getting-started-installation">Installation</h3><p>Cart.js is available via the <code>npm</code> or <code>bower</code> package managers, from
 <a href="https://cdnjs.com">cdnjs</a>, or simply by downloading the latest version of the
 library. </p>
-<h4>NPM</h4><pre><code class="language-shell">npm install shopify-cartjs
+<h4 id="npm">NPM</h4>
+<pre><code class="language-shell">npm install shopify-cartjs
 </code></pre>
-<h4>Bower</h4><pre><code class="language-shell">bower install shopify-cartjs
+<h4 id="bower">Bower</h4>
+<pre><code class="language-shell">bower install shopify-cartjs
 </code></pre>
-<h4>CDNJS</h4><pre><code class="language-html">&lt;!-- Only include one of the below in your theme. --&gt;
+<h4 id="cdnjs">CDNJS</h4>
+<pre><code class="language-html">&lt;!-- Only include one of the below in your theme. --&gt;
 &lt;script type=&quot;text/javascript&quot; src=&quot;https://cdnjs.cloudflare.com/ajax/libs/shopify-cartjs/{{ version }}/cart.min.js&quot;&gt;&lt;/script&gt;
 &lt;script type=&quot;text/javascript&quot; src=&quot;https://cdnjs.cloudflare.com/ajax/libs/shopify-cartjs/{{ version }}/rivets-cart.min.js&quot;&gt;&lt;/script&gt;
 </code></pre>
-<h4>Download</h4><p>Download the latest version of the library: <a href="{{ "cartjs.zip" | asset_url }}">cartjs.zip</a>.</p>
+<h4 id="download">Download</h4>
+<p>Download the latest version of the library: &lt;a href=&quot;{{ &quot;cartjs.zip&quot; | asset_url }}&quot;&gt;cartjs.zip</a>.</p>
 <h3 id="getting-started-setup">Setup</h3><p>The Cart.js distribution comes packaged with three versions of the library:</p>
 <div class="callout callout-success">
     <p>
-        <code>cart.js</code> is the unminified source code, containing the Core and Data APIs.
+        `cart.js` is the unminified source code, containing the Core and Data APIs.
     </p>
 
-    <p>
-        <code>cart.min.js</code> is a minified version of the library, and also contains the Core and Data APIs.
-    </p>
+<pre><code>&lt;p&gt;
+    `cart.min.js` is a minified version of the library, and also contains the Core and Data APIs.
+&lt;/p&gt;
 
-    <p>
-        <code>rivets-cart.min.js</code> is a minified version of Cart.js that also bundles the Rivets.js library.
-        Together, they provide support for the DOM Binding functionality.
-    </p><br></div>
+&lt;p&gt;
+    `rivets-cart.min.js` is a minified version of Cart.js that also bundles the Rivets.js library.
+    Together, they provide support for the DOM Binding functionality.
+&lt;/p&gt;   
+</code></pre>
+</div>
 
 <p>Once you&#39;ve selected the version you&#39;d like to use, add the relevant file to your theme&#39;s <code>/assets</code> directory.</p>
 <p>You then just need to include the script on your page and call <code>CartJS.init()</code>.
@@ -46,10 +52,10 @@ The best place to do this is at the bottom of your theme&#39;s <code>theme.liqui
 
         &lt;!-- Include jQuery from Google&#39;s CDN. --&gt;
         &lt;!-- Your theme may already include jQuery - if so, you can skip this line. --&gt;
-        {{ &#39;//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js&#39; | script_tag }}
+        &lt;script src=&quot;{{ &#39;//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js&#39; }}&quot; defer&gt;&lt;/script&gt;
 
         &lt;!-- Include Cart.js --&gt;
-        {{ &#39;cart.min.js&#39; | asset_url | script_tag }}
+        &lt;script src=&quot;{{ &#39;cart.min.js&#39; | asset_url }}&quot; defer&gt;&lt;/script&gt;
 
         &lt;!-- Initialise Cart.js once the page has loaded --&gt;
         &lt;script type=&quot;text/javascript&quot;&gt;
@@ -67,16 +73,17 @@ This tells Liquid to render the initial cart state as a JSON object and pass it 
 <div class="callout callout-warning">
     <h4>Dependency when formatting monetary values</h4>
 
-    <p>
-        If you&#39;re using any of the money-formatting features of Cart.js (such as the <code>| money</code> filter in the DOM Binding
-        module or the <code>data-cart-render</code> attributes of the Data API), you&#39;ll need to make sure that Shopify&#39;s currency
-        Javascript library is loaded.
-    </p>
+<pre><code>&lt;p&gt;
+    If you&#39;re using any of the money-formatting features of Cart.js (such as the `| money` filter in the DOM Binding
+    module or the `data-cart-render` attributes of the Data API), you&#39;ll need to make sure that Shopify&#39;s currency
+    Javascript library is loaded.
+&lt;/p&gt;
 
-    <p>
-        Do this simply by ensuring that the <code>option_selection.js</code> library is loaded on all of your theme&#39;s pages, using
-        a line something like <code>{% raw %}{{ &#39;option_selection.js&#39; | shopify_asset_url | script_tag }}{% endraw %}</code> in your <code>theme.liquid</code>.
-    </p>
+&lt;p&gt;
+    Do this simply by ensuring that the `option_selection.js` library is loaded on all of your theme&#39;s pages, using
+    a line something like `{% raw %}{{ &#39;option_selection.js&#39; | shopify_asset_url | script_tag }}{% endraw %}` in your `theme.liquid`.
+&lt;/p&gt;
+</code></pre>
 </div>
 <h3 id="getting-started-next-steps">Next Steps</h3><p>Now that you gotten Cart.js set up with your theme, you&#39;re ready to start using the library.</p>
 <p>The recommended (and easiest) way to interact with Cart.js is via the Data API.
@@ -88,9 +95,10 @@ Of course, these two approaches aren&#39;t mutually exclusive - you can always u
         The Core API is covered first in the documentation below, as it provides the foundation for the Data API.
     </p>
 
-    <p>
-        However, if you just want to get stuck in to using Cart.js, feel free to go straight to the coverage of the <a href="#data-api">Data API</a>.
-    </p>
+<pre><code>&lt;p&gt;
+    However, if you just want to get stuck in to using Cart.js, feel free to go straight to the coverage of the &lt;a href=&quot;#data-api&quot;&gt;Data API&lt;/a&gt;.
+&lt;/p&gt;
+</code></pre>
 </div>
 
 <p>Once you&#39;ve gotten the hang of the Core and Data APIs, you might be interested in using Cart.js in conjunction with Rivets.js to create HTML templates that are automatically updated along with your cart.
@@ -109,22 +117,24 @@ store to support Internet Explorer 8, so as long as you don&#39;t have a special
 case that requires supporting these older browsers, you can happily use the DOM
 Binding library in your themes. </p>
 <div class="callout callout-success">
-    <h4>What&#39;s the issue with older browsers?</h4>
+    <h4>What's the issue with older browsers?</h4>
+    
+<pre><code>&lt;p&gt;
+    Non-ES5 browsers (namely, IE8) don&#39;t support EcmaScript 5&#39;s
+    `Object.defineProperty()` method, which Rivets.js uses to observe
+    changes on data models and trigger DOM updates.
+&lt;/p&gt;
 
-    <p>
-        Non-ES5 browsers (namely, IE8) don&#39;t support EcmaScript 5&#39;s
-        <code>Object.defineProperty()</code> method, which Rivets.js uses to observe
-        changes on data models and trigger DOM updates.
-    </p>
-
-    <p>
-        Earlier versions of Cart.js provided a workaround for this by bundling
-        a number of ES5 shims and polyfills into the library, as well as
-        forcibly binding and re-binding Rivets views whenever a charge to the
-        cart occurred. This &quot;compatibility mode&quot; was dropped once Shopify
-        changed their theme guidelines to only require support for Internet
-        Explorer 9+.
-    </p><br></div>
+&lt;p&gt;
+    Earlier versions of Cart.js provided a workaround for this by bundling
+    a number of ES5 shims and polyfills into the library, as well as
+    forcibly binding and re-binding Rivets views whenever a charge to the
+    cart occurred. This &quot;compatibility mode&quot; was dropped once Shopify
+    changed their theme guidelines to only require support for Internet
+    Explorer 9+.
+&lt;/p&gt;    
+</code></pre>
+</div>
 <h3 id="getting-started-module-loaders">Module Loaders</h3><p>If you&#39;re using Cart.js and Rivets with module loaders like Webpack, you&#39;ll
 need to make a couple of minor tweaks to ensure things work smoothly. </p>
 <p>Ensure you&#39;re pulling in jQuery and Rivets in your <code>webpack.config.js</code> or
@@ -166,16 +176,17 @@ Here&#39;s an example from the developer console in Chrome:</p>
 </figure>
 
 <div class="callout callout-warning">
-    <h4>Don&#39;t write values via the cart object</h4>
+    <h4>Don't write values via the cart object</h4>
 
-    <p>
-        You should only ever <em>read</em> values from <code>CartJS.cart</code>, and avoid altering the object directly.
-    </p>
+<pre><code>&lt;p&gt;
+    You should only ever *read* values from `CartJS.cart`, and avoid altering the object directly.
+&lt;/p&gt;
 
-    <p>
-        Assigning a value with code like <code>CartJS.cart.items[0].quantity = 5;</code> will make the change locally in the browser, but won&#39;t save it to the server.
-        This means that the changes will be lost when the customer refreshes or navigates to a new page, or when Cart.js fetches an updated version of the cart from Shopify.
-    </p>
+&lt;p&gt;
+    Assigning a value with code like `CartJS.cart.items[0].quantity = 5;` will make the change locally in the browser, but won&#39;t save it to the server.
+    This means that the changes will be lost when the customer refreshes or navigates to a new page, or when Cart.js fetches an updated version of the cart from Shopify.
+&lt;/p&gt;
+</code></pre>
 </div>
 <h3 id="core-api-adding-items">Adding Items</h3><p>Adding items to your cart is as simple as calling <code>CartJS.addItem()</code>, and passing the ID of the variant you&#39;d like to add as the first argument.</p>
 <p>Assume we have a Shopify store that&#39;s selling widgets, and that one of those widgets has a variant with an ID of <code>12345678</code> that costs $9.99.
@@ -229,25 +240,27 @@ You can call <code>addItem()</code> as many times as you like in the same functi
 <div class="callout callout-success">
     <h4>Adding multiple line items at once</h4>
 
-    <p>
-        If you&#39;re adding multiple line items at once, you can use the <code>CartJS.addItems()</code> method, rather than multiple calls to <code>CartJS.addItem()</code>.
-    </p>
+<pre><code>&lt;p&gt;
+    If you&#39;re adding multiple line items at once, you can use the `CartJS.addItems()` method, rather than multiple calls to `CartJS.addItem()`.
+&lt;/p&gt;
 
-    <p>
-        This method leverages new functionality added to the Shopify Ajax API in January 2020 that supports multiple items being added at once.
-    </p>
+&lt;p&gt;
+    This method leverages new functionality added to the Shopify Ajax API in January 2020 that supports multiple items being added at once.
+&lt;/p&gt;
+</code></pre>
 </div> 
 
 <div class="callout callout-warning">
     <h4>Note on multiple line items with the same variant ID</h4>
 
-    <p>
-        Shopify will collate multiple line items for the same variant into one &mdash; for example, if we clicked &quot;Add Five Widgets&quot; in the example above again, we&#39;d end up with one line item with <code>&quot;quantity&quot;: 10</code> instead of two line item with <code>&quot;quantity: 5&quot;</code>.
-    </p>
+<pre><code>&lt;p&gt;
+    Shopify will collate multiple line items for the same variant into one &amp;mdash; for example, if we clicked &quot;Add Five Widgets&quot; in the example above again, we&#39;d end up with one line item with `&quot;quantity&quot;: 10` instead of two line item with `&quot;quantity: 5&quot;`.
+&lt;/p&gt;
 
-    <p>
-        However, this <em>doesn&#39;t</em> apply when you add the same variant with custom line item properties that differ &mdash; if we changed the value of the <code>added_by</code> property and clicked the button, we&#39;d end up with separate line items.
-    </p>
+&lt;p&gt;
+    However, this *doesn&#39;t* apply when you add the same variant with custom line item properties that differ &amp;mdash; if we changed the value of the `added_by` property and clicked the button, we&#39;d end up with separate line items.
+&lt;/p&gt;
+</code></pre>
 </div>
 <h3 id="core-api-updating-items">Updating Items</h3><p>Updating the quantities or properties of line items is just as simple as adding them -- we just make a call to the <code>updateItem()</code> method.</p>
 <p>Let&#39;s continue from our example above, and say we want to have a button that doubles the number of widgets in our order.</p>
@@ -263,18 +276,19 @@ You can call <code>addItem()</code> as many times as you like in the same functi
 <div class="callout callout-warning">
     <h4>Existing items referenced by index, not variant ID</h4>
 
-    <p>
-        One important thing to note is that the <code>updateItem()</code> method takes the <strong><em>line number</em></strong> (the &quot;index&quot;) of the item in the cart you&#39;d like to update, not the variant ID.
-        This is because it&#39;s possible (and quite common) to have multiple items in the cart with the same variant ID but with different properties.
-    </p>
+<pre><code>&lt;p&gt;
+    One important thing to note is that the `updateItem()` method takes the ***line number*** (the &quot;index&quot;) of the item in the cart you&#39;d like to update, not the variant ID.
+    This is because it&#39;s possible (and quite common) to have multiple items in the cart with the same variant ID but with different properties.
+&lt;/p&gt;
 
-    <p>
-        Shopify uses a 1-based index for line items, so the index of the first line item in a cart is <code>1</code>, not <code>0</code> as is common in many programming languages.
-    </p>
+&lt;p&gt;
+    Shopify uses a 1-based index for line items, so the index of the first line item in a cart is `1`, not `0` as is common in many programming languages.
+&lt;/p&gt;
 
-    <p>
-        If you&#39;d like to update an item using just the variant ID, you can use <code>updateItemById()</code>, which operates the same way as <code>updateItem()</code> but takes the variant ID as the first parameter.
-    </p>
+&lt;p&gt;
+    If you&#39;d like to update an item using just the variant ID, you can use `updateItemById()`, which operates the same way as `updateItem()` but takes the variant ID as the first parameter.
+&lt;/p&gt;
+</code></pre>
 </div>
 <h3 id="core-api-removing-items">Removing Items</h3><p>Removing items works in a similar way to updating items -- just call the <code>removeItem()</code> method, passing the line number of the line item you&#39;d like to remove.
 As with the update method, if you&#39;d like to remove all line items with a particular variant ID, you can use <code>removeItemById()</code> instead.</p>
@@ -316,23 +330,23 @@ We want to inform the user of the success or failure of their action, and potent
 
 &lt;script type=&quot;text/javascript&quot;&gt;
     $(&#39;#button&#39;).click(function() {
-
+    
         // Call the addItem() method.
         // Note the empty object as the third argument, representing no line item properties.  
         CartJS.addItem(12345678, 1, {}, {
-
+        
             // Define a success callback to display a success message.
             &quot;success&quot;: function(data, textStatus, jqXHR) {
                 $(&#39;#message&#39;).addClass(&#39;message-success&#39;);
                 $(&#39;#message&#39;).html(&#39;Successfully added to cart.&#39;);
             },
-
+            
             // Define an error callback to display an error message.
             &quot;error&quot;: function(jqXHR, textStatus, errorThrown) {
                 $(&#39;#message&#39;).addClass(&#39;message-error&#39;);
                 $(&#39;#message&#39;).html(&#39;There was a problem adding to the cart!&#39;);
             }
-
+            
         });
     });
 &lt;/script&gt;
@@ -388,19 +402,19 @@ We want to inform the user of the success or failure of their action, and potent
 <p>When the customer clicks &quot;Buy Now&quot;, Cart.js will intercept the form submission and convert it to an Ajax request.
 All of the usual inputs - <code>id</code> to specify the variant ID, <code>quantity</code> to specify the quantity, <code>selling_plan</code> to specify the selling plan, and <code>properties[]</code> to specify line item properties - are supported.</p>
 <div class="callout callout-danger">
-    <h4>Form submission doesn&#39;t work with files</h4>
+    <h4>Form submission doesn't work with files</h4>
     <p>
-        Because Ajax requests don&#39;t support <code>POST</code> requests with <code>enctype=&quot;multipart/form-data&quot;</code>, Cart.js won&#39;t be able to submit your form if it contains <code>&lt;input type=&quot;file&quot;&gt;</code> elements.
+        Because Ajax requests don't support `POST` requests with `enctype="multipart/form-data"`, Cart.js won't be able to submit your form if it contains `<input type="file">` elements.
     </p>
     <p>
-        This is something that we hope to auto-detect in future, but for now you should avoid using <code>data-cart-submit</code> on forms that need to upload files.
+        This is something that we hope to auto-detect in future, but for now you should avoid using `data-cart-submit` on forms that need to upload files.
     </p>
 </div>
 
 <div class="callout callout-danger">
-    <h4>Form submission doesn&#39;t work with checkout forms</h4>
+    <h4>Form submission doesn't work with checkout forms</h4>
     <p>
-        Be careful not to add the <code>data-cart-submit</code> attribute to forms that target <code>action=&quot;/checkout&quot;</code>, as Cart.js will intercept the event and customers won&#39;t be redirected to the checkout. 
+        Be careful not to add the `data-cart-submit` attribute to forms that target `action="/checkout"`, as Cart.js will intercept the event and customers won't be redirected to the checkout. 
     </p>
 </div>
 <h2 id="events">Events</h2><p>To make it easy to respond to changes in the customer&#39;s cart, Cart.js fires a number of custom jQuery events that you can bind listeners to.</p>
