@@ -33,9 +33,9 @@ module.exports = (grunt) ->
         options:
           banner: '<%= meta.banner %>'
         files:
+          # Drop-in: Tinybind bundles sightglass internally; keep rivets-cart.js filename for themes
           'dist/rivets-cart.js': [
-            'node_modules/sightglass/index.js',
-            'node_modules/rivets/dist/rivets.js',
+            'node_modules/tinybind/dist/tinybind.js',
             'dist/cart.js'
           ]
 

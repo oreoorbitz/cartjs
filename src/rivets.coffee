@@ -1,16 +1,35 @@
 # CartJS.Rivets
-# Adds Rivets.js functionality to CartJS if Rivets.js is available.
+# Adds Rivets.js / Tinybind functionality to CartJS if available.
+# Drop-in: supports both rivets (0.9.6) and tinybind (1.0.0) via alias.
 # -----------------------------------------------------------------
 
-if rivets?
+# Resolve binding engine — prefer tinybind, fallback to rivets
+_bindingEngine = null
+if typeof tinybind isnt "undefined" and tinybind?
+  _bindingEngine = tinybind
+  # Alias for legacy themes that reference window.rivets
+  window.rivets = tinybind if typeof rivets is "undefined" or not rivets?
+else if typeof rivets isnt "undefined" and rivets?
+  _bindingEngine = rivets
+  # Alias for new code that references tinybind
+  window.tinybind = rivets if typeof tinybind is "undefined" or not tinybind?
 
-  # Rivets.js has been loaded, so declare the CartJS.Rivets module.
+# Ensure both globals point to same object for drop-in (strict ===)
+if _bindingEngine?
+  window.rivets = _bindingEngine
+  window.tinybind = _bindingEngine
+  rivets = _bindingEngine
+  tinybind = _bindingEngine
+
+if _bindingEngine?
+
+  # Rivets.js / Tinybind has been loaded, so declare the CartJS.Rivets module.
   CartJS.Rivets =
 
     # Maintain a reference to the base model object so that we can reference it later.
     model: null
 
-    # Maintain a list of all bound Rivets.js views so that we can unbind later if needed.
+    # Maintain a list of all bound views so that we can unbind later if needed.
     boundViews: []
 
     # Initialise the Rivets module.
@@ -23,7 +42,7 @@ if rivets?
 
     # Bind all Rivets.js view elements that are currently present on the page.
     bindViews: () ->
-      CartJS.Utils.log('Rivets.js is present, binding views.')
+      CartJS.Utils.log('Rivets.js/Tinybind is present, binding views.')
 
       # Unbind any currently bound views.
       CartJS.Rivets.unbindViews()
@@ -34,108 +53,125 @@ if rivets?
       }, CartJS.settings.rivetsModels)
 
       # If Shopify's Currency global object is available, add it to the data model.
-      # Done so that we can observer Currency.currentCurrency for changes.
       if window.Currency?
         CartJS.Rivets.model.Currency = window.Currency
 
-      # Iterate through and bind all elements marked as Rivets.js views via the [data-cart-view] attribute.
+      # Iterate through and bind all elements marked as views via the [data-cart-view] attribute.
       jQuery('[data-cart-view]').each () ->
-        view = rivets.bind(jQuery(this), CartJS.Rivets.model)
+        view = _bindingEngine.bind(jQuery(this), CartJS.Rivets.model)
         CartJS.Rivets.boundViews.push(view)
 
-    # Unbind all currently bound Rivets.js views.
+    # Unbind all currently bound views.
     unbindViews: () ->
       for view in CartJS.Rivets.boundViews
         view.unbind()
       CartJS.Rivets.boundViews = []
 
-  # Add useful general-purpose formatters for Rivets.js
-  rivets.formatters.eq = (a, b) ->
+  # Add useful general-purpose formatters (register on both globals for drop-in)
+  _registerFormatter = (name, fn) ->
+    _bindingEngine.formatters[name] = fn
+    # Keep rivets/tinybind in sync if they are separate objects (should be ===, but be safe)
+    if typeof rivets isnt "undefined" and rivets? and rivets isnt _bindingEngine
+      rivets.formatters[name] = fn
+    if typeof tinybind isnt "undefined" and tinybind? and tinybind isnt _bindingEngine
+      tinybind.formatters[name] = fn
+
+  _registerFormatter 'eq', (a, b) ->
     a == b
 
-  rivets.formatters.includes = (a, b) ->
+  _registerFormatter 'includes', (a, b) ->
     a.indexOf(b) >= 0
 
-  rivets.formatters.match = (a, regexp, flags) ->
+  _registerFormatter 'match', (a, regexp, flags) ->
     a.match(new RegExp(regexp, flags))
 
-  rivets.formatters.lt = (a, b) ->
+  _registerFormatter 'lt', (a, b) ->
     a < b
 
-  rivets.formatters.gt = (a, b) ->
+  _registerFormatter 'gt', (a, b) ->
     a > b
 
-  rivets.formatters.not = (a) ->
+  _registerFormatter 'not', (a) ->
     !a
 
-  rivets.formatters.empty = (a) ->
+  _registerFormatter 'empty', (a) ->
     !a.length
 
-  rivets.formatters.plus = (a, b) ->
+  _registerFormatter 'plus', (a, b) ->
     parseInt(a) + parseInt(b)
 
-  rivets.formatters.minus = (a, b) ->
+  _registerFormatter 'minus', (a, b) ->
     parseInt(a) - parseInt(b)
 
-  rivets.formatters.times = (a, b) ->
+  _registerFormatter 'times', (a, b) ->
     a * b
 
-  rivets.formatters.divided_by = (a, b) ->
+  _registerFormatter 'divided_by', (a, b) ->
     a / b
 
-  rivets.formatters.modulo = (a, b) ->
+  _registerFormatter 'modulo', (a, b) ->
     a % b
 
-  rivets.formatters.prepend = (a, b) ->
+  _registerFormatter 'prepend', (a, b) ->
     b + a
 
-  rivets.formatters.append = (a, b) ->
+  _registerFormatter 'append', (a, b) ->
     a + b
 
-  rivets.formatters.slice = (value, start, end) ->
+  _registerFormatter 'slice', (value, start, end) ->
     value.slice(start, end)
 
-  rivets.formatters.pluralize = (input, singular, plural = singular + 's') ->
+  _registerFormatter 'pluralize', (input, singular, plural = singular + 's') ->
     input = input.length if CartJS.Utils.isArray(input)
     if input == 1 then singular else plural
 
-  rivets.formatters.array_element = (array, index) ->
+  _registerFormatter 'array_element', (array, index) ->
     array[index];
 
-  rivets.formatters.array_first = (array) ->
+  _registerFormatter 'array_first', (array) ->
     array[0];
 
-  rivets.formatters.array_last = (array) ->
+  _registerFormatter 'array_last', (array) ->
     array[array.length - 1];
 
-  # Add Shopify-specific formatters for Rivets.js.
-  rivets.formatters.money = (value, currency) ->
+  # Add Shopify-specific formatters
+  _registerFormatter 'money', (value, currency) ->
     CartJS.Utils.formatMoney(value, CartJS.settings.moneyFormat, 'money_format', currency)
 
-  rivets.formatters.money_with_currency = (value, currency) ->
+  _registerFormatter 'money_with_currency', (value, currency) ->
     CartJS.Utils.formatMoney(value, CartJS.settings.moneyWithCurrencyFormat, 'money_with_currency_format', currency)
 
-  rivets.formatters.weight = (grams) ->
+  _registerFormatter 'weight', (grams) ->
     switch CartJS.settings.weightUnit
       when 'kg' then (grams / 1000).toFixed(CartJS.settings.weightPrecision)
       when 'oz' then (grams * 0.035274).toFixed(CartJS.settings.weightPrecision)
       when 'lb' then (grams * 0.00220462).toFixed(CartJS.settings.weightPrecision)
       else grams.toFixed(CartJS.settings.weightPrecision)
 
-  rivets.formatters.weight_with_unit = (grams) ->
-    rivets.formatters.weight(grams) + CartJS.settings.weightUnit
+  _registerFormatter 'weight_with_unit', (grams) ->
+    _bindingEngine.formatters.weight(grams) + CartJS.settings.weightUnit
 
-  rivets.formatters.product_image_size = (src, size) ->
+  _registerFormatter 'product_image_size', (src, size) ->
     CartJS.Utils.getSizedImageUrl(src, size)
 
   # Add camelCase aliases for underscore formatters.
-  rivets.formatters.moneyWithCurrency = rivets.formatters.money_with_currency
-  rivets.formatters.weightWithUnit = rivets.formatters.weight_with_unit
-  rivets.formatters.productImageSize = rivets.formatters.product_image_size
+  _registerFormatter 'moneyWithCurrency', _bindingEngine.formatters.money_with_currency
+  _registerFormatter 'weightWithUnit', _bindingEngine.formatters.weight_with_unit
+  _registerFormatter 'productImageSize', _bindingEngine.formatters.product_image_size
+
+  # Tinybind compatibility shims for Rivets drop-in
+  # 1. index → $index (Tinybind uses $index, Rivets used index)
+  # Provide formatter alias so {index} still works if Tinybind provides $index
+  if _bindingEngine.formatters['$index']? and not _bindingEngine.formatters['index']?
+    _registerFormatter 'index', (value) -> value
+
+  # 2. unless binder was removed in Tinybind — shim via if+not is documented, but provide alias binder if needed
+  if _bindingEngine.binders? and not _bindingEngine.binders['unless']? and _bindingEngine.binders['if']?
+    _bindingEngine.binders['unless'] = _bindingEngine.binders['if']
 
 else
 
-  # Rivets.js has not been loaded, so just declare a no-operation CartJS.Rivets module.
+  # Rivets.js / Tinybind has not been loaded, so just declare a no-operation CartJS.Rivets module.
   CartJS.Rivets =
 
     init: () ->

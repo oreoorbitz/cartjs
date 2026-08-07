@@ -21,8 +21,12 @@
 
     <!-- Cart.js dependencies and Cart.js libary. -->
     <script src="../node_modules/jquery/dist/jquery.js"></script>
-    <script src="../node_modules/sightglass/index.js"></script>
-    <script src="../node_modules/rivets/dist/rivets.js"></script>
+    <!-- Tinybind drop-in: bundles sightglass internally, keep rivets alias for legacy themes -->
+    <script src="../node_modules/tinybind/dist/tinybind.js"></script>
+    <script>window.rivets = window.tinybind; window.tinybind = window.rivets;</script>
+    <!-- Legacy rivets kept for one release for drop-in verification (remove after) -->
+    <!-- <script src="../node_modules/sightglass/index.js"></script>
+    <script src="../node_modules/rivets/dist/rivets.js"></script> -->
     <script src="../dist/cart.js"></script>
 
     <script>mocha.setup('bdd')</script>
@@ -32,6 +36,7 @@
 
     <!-- Our tests. -->
     <script src="cartjs/formatters.js"></script>
+    <script src="cartjs/tinybind-dropin.js"></script>
 
     <script>
       if (window.mochaPhantomJS) {
