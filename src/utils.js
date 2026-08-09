@@ -159,5 +159,15 @@ CartJS.Utils = {
     } else {
       if (src) { return src; } else { return 'https://cdn.shopify.com/s/images/admin/no-image-large.gif'; }
     }
+  },
+
+  // Return a locale-aware URL for Cart API endpoints.
+  // Uses window.Shopify.routes.root when available (e.g. "/de/" for German storefront).
+  // Falls back to "/" for tests / non-Shopify contexts.
+  getUrl(path) {
+    var root = (typeof window !== 'undefined' && window.Shopify && window.Shopify.routes && window.Shopify.routes.root) || (typeof window !== 'undefined' && window.routes && window.routes.root) || '/';
+    if (root && root[root.length - 1] !== '/') { root += '/'; }
+    if (path && path[0] === '/') { path = path.slice(1); }
+    return root + path;
   }
 };

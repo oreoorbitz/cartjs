@@ -2,6 +2,13 @@ import fs from 'fs';
 import path from 'path';
 import { transform } from 'esbuild';
 
+// CartJS build — IIFE concat, mepto external (not bundled)
+// Theme loads mepto OR jQuery separately via <script> tag
+// mepto-adapter.js (first in srcOrder) aliases window.mepto === window.jQuery === window.$
+// so dist/cart.js works with either. See src/mepto-adapter.js.
+// Dev uses global `mepto` (no import) for drop-in parity; future ESM entry will
+// use `import mepto from 'meptos'` with rollup external (see lib stub below).
+
 const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 const banner = `// Cart.js\n// version: ${pkg.version}\n// author: ${pkg.author}\n// license: ${pkg.licenses[0].type}\n`;
 
@@ -26,14 +33,12 @@ function buildCart() {
   const wrapped = banner + '(function() {\n' + joined + '\n}).call(typeof window !== "undefined" ? window : this);';
   fs.mkdirSync('dist', { recursive: true });
   fs.writeFileSync('dist/cart.js', wrapped);
-  console.log('Built dist/cart.js (' + wrapped.length + ' bytes)');
+  console.log('Built dist/cart.js (' + wrapped.length + ' bytes) — mepto external, graceful fallback to jQuery');
 }
 
 function buildRivetsCart() {
   const tinybind = fs.readFileSync(tinybindPath, 'utf8');
   const cart = fs.readFileSync('dist/cart.js', 'utf8');
-  // Rivets-cart keeps banner once, then tinybind + cart without duplicate banner
-  // Remove banner from cart if present to avoid duplicate, then re-add once
   let cartWithoutBanner = cart;
   if (cart.startsWith(banner)) {
     cartWithoutBanner = cart.slice(banner.length);
@@ -58,7 +63,6 @@ async function minify(inputPath, outputPath) {
 const cartjsPlugin = {
   name: 'cartjs-concat',
   async buildStart() {
-    // Tell Vite to watch these files for --watch
     for (const f of srcOrder) {
       this.addWatchFile(path.resolve(f));
     }
@@ -66,27 +70,22 @@ const cartjsPlugin = {
     this.addWatchFile(path.resolve('package.json'));
   },
   async closeBundle() {
-    // This runs after Vite's own bundle (which we keep empty)
-    // Do our concat builds here so they run on every vite build
     buildCart();
     buildRivetsCart();
     await minify('dist/cart.js', 'dist/cart.min.js');
     await minify('dist/rivets-cart.js', 'dist/rivets-cart.min.js');
-    // Clean up Vite dummy chunk
     try { fs.unlinkSync('dist/dummy.js'); } catch {}
     try { fs.unlinkSync('dist/dummy.js.map'); } catch {}
   }
 };
 
 export default {
-  // We keep Vite's own build minimal — our plugin does the real work via closeBundle
-  // No dummy lib entry needed — we use a virtual input to avoid empty chunk
   build: {
     outDir: 'dist',
     emptyOutDir: false,
-    // Use a tiny virtual entry to satisfy Vite without emitting a dummy file
     rollupOptions: {
       input: 'src/cart.js',
+      external: ['meptos', 'tinybind', 'jquery'], // never bundle — theme provides via <script>
       output: {
         entryFileNames: 'dummy.js',
         chunkFileNames: 'dummy-[name].js',
@@ -98,3 +97,10 @@ export default {
   },
   plugins: [cartjsPlugin]
 };
+
+// Future ESM dev entry (not active yet):
+// When src/* migrate to `import mepto from 'meptos'`, replace above rollupOptions with:
+//   lib: { entry: 'src/export.js', name: 'CartJS', formats: ['iife','es','cjs'], fileName: f => f==='iife'?'cart.js':`cart.${f}.js` }
+//   external: ['meptos','tinybind']
+//   output: { banner, globals: { meptos: 'mepto', tinybind: 'tinybind' } }
+// and keep `dist/cart.js` IIFE name frozen for CDN.

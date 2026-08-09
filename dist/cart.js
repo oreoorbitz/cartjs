@@ -3,68 +3,70 @@
 // author: Gavin Ballard
 // license: MIT
 (function() {
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- */
-// CartJS Mepto Adapter
-// Ensures window.jQuery, window.$, window.mepto are strict === for drop-in.
-// Prefers Mepto (meptos) with jQuery fallback. For themes that already load jQuery, keep it.
+// CartJS Mepto Adapter — graceful fallback, not bundled
+// Resolves adapter at runtime: prefers window.mepto, falls back to window.jQuery/window.$
+// Ensures window.mepto, window.jQuery, window.$ are strict === for drop-in
+// dist/cart.js remains external: theme loads mepto or jQuery separately via <script> tag
 
-(function() {
+(function () {
   var adapter = null;
+  var hasWindow = typeof window !== 'undefined';
 
-  // Try to resolve Mepto from globals first (browser UMD)
-  if (typeof window !== 'undefined') {
+  // 1. Prefer mepto already on page (theme loaded meptos.min.js)
+  if (hasWindow) {
     if (window.mepto) {
       adapter = window.mepto;
     } else if (window.$ && window.$.mepto) {
-      // Mepto may set $ with mepto flag
+      // Mepto may expose itself as $
       adapter = window.$;
     } else if (window.jQuery) {
+      // Graceful fallback: jQuery present (legacy theme, e.g. example theme)
       adapter = window.jQuery;
+    } else if (window.$) {
+      adapter = window.$;
     }
   }
 
-  // Try CommonJS require if not in browser (Node, bundler)
+  // 2. Node / bundler fallback (Vitest happy-dom, build)
   if (!adapter) {
     try {
       var meptos = require('meptos');
-      if (meptos && meptos.$) {
-        adapter = meptos.$;
-      } else if (meptos && meptos.mepto) {
-        adapter = meptos.mepto;
-      } else {
-        adapter = meptos;
-      }
+      if (meptos && meptos.$) adapter = meptos.$;
+      else if (meptos && meptos.mepto) adapter = meptos.mepto;
+      else adapter = meptos;
     } catch (e) {
-      // no meptos in Node, fallback to jquery if available
       try {
         adapter = require('jquery');
       } catch (e2) {}
     }
   }
 
-  // Alias for drop-in: all three globals strict ===
-  if (typeof window !== 'undefined' && adapter) {
-    // Prefer Mepto if both exist — Mepto is the modern path
-    var preferred = null;
-    if (window.mepto) {
-      preferred = window.mepto;
-    } else if (adapter && adapter.mepto) {
-      preferred = adapter;
-    } else {
-      preferred = adapter;
-    }
-    // Ensure all globals point to same object
+  // 3. Alias all globals to same object so existing theme code
+  //    `jQuery(document).on('cart.requestComplete', ...)` keeps working
+  //    whether theme loaded mepto or jQuery
+  if (hasWindow && adapter) {
+    var preferred = window.mepto || adapter;
+    // If both mepto and jQuery exist, prefer mepto (modern path)
+    if (window.mepto && window.mepto.mepto) preferred = window.mepto;
+    else if (adapter && adapter.mepto) preferred = adapter;
+
+    window.mepto = preferred;
     window.jQuery = preferred;
     window.$ = preferred;
-    window.mepto = preferred;
-    // Also expose as globals for Node-like env
+
     if (typeof global !== 'undefined') {
+      global.mepto = preferred;
       global.jQuery = preferred;
       global.$ = preferred;
-      global.mepto = preferred;
+    }
+  } else if (typeof global !== 'undefined' && adapter) {
+    global.mepto = adapter;
+    global.jQuery = adapter;
+    global.$ = adapter;
+    if (hasWindow) {
+      window.mepto = adapter;
+      window.jQuery = adapter;
+      window.$ = adapter;
     }
   }
 })();
@@ -203,15 +205,15 @@ CartJS.init = function(cart, settings) {
   // Set up toggling of CSS class on body during requests if provided.
   if (CartJS.settings.requestBodyClass) {
     CartJS.Utils.log('"requestBodyClass" set, adding event listeners.');
-    jQuery(document).on('cart.requestStarted', () => jQuery('body').addClass(CartJS.settings.requestBodyClass));
-    jQuery(document).on('cart.requestComplete', () => jQuery('body').removeClass(CartJS.settings.requestBodyClass));
+    mepto(document).on('cart.requestStarted', () => mepto('body').addClass(CartJS.settings.requestBodyClass));
+    mepto(document).on('cart.requestComplete', () => mepto('body').removeClass(CartJS.settings.requestBodyClass));
   }
 
   // Initialise DOM Binding through Rivets module.
   // Performs a no-op if Rivets.js isn't present.
   CartJS.Rivets.init();
 
-  return jQuery(document).trigger('cart.ready', [CartJS.cart]);
+  return mepto(document).trigger('cart.ready', [CartJS.cart]);
 };
 
 // Configure CartJS with the given settings object.
@@ -389,6 +391,16 @@ CartJS.Utils = {
     } else {
       if (src) { return src; } else { return 'https://cdn.shopify.com/s/images/admin/no-image-large.gif'; }
     }
+  },
+
+  // Return a locale-aware URL for Cart API endpoints.
+  // Uses window.Shopify.routes.root when available (e.g. "/de/" for German storefront).
+  // Falls back to "/" for tests / non-Shopify contexts.
+  getUrl(path) {
+    var root = (typeof window !== 'undefined' && window.Shopify && window.Shopify.routes && window.Shopify.routes.root) || (typeof window !== 'undefined' && window.routes && window.routes.root) || '/';
+    if (root && root[root.length - 1] !== '/') { root += '/'; }
+    if (path && path[0] === '/') { path = path.slice(1); }
+    return root + path;
   }
 };;
 /*
@@ -433,7 +445,7 @@ CartJS.Queue = {
     if (processing) { return; }
 
     // Start processing.
-    jQuery(document).trigger('cart.requestStarted', [CartJS.cart]);
+    mepto(document).trigger('cart.requestStarted', [CartJS.cart]);
     return CartJS.Queue.process();
   },
 
@@ -441,14 +453,14 @@ CartJS.Queue = {
   process() {
     if (!queue.length) {
       processing = false;
-      jQuery(document).trigger('cart.requestComplete', [CartJS.cart]);
+      mepto(document).trigger('cart.requestComplete', [CartJS.cart]);
       return;
     }
 
     processing = true;
     const params = queue.shift();
     params.complete = CartJS.Queue.process;
-    return jQuery.ajax(params);
+    return mepto.ajax(params);
   }
 };
 ;
@@ -465,11 +477,12 @@ CartJS.Queue = {
 CartJS.Core = {
 
   // Fetch updated cart object from API endpoint.
+  // Uses window.Shopify.routes.root for locale-aware URLs (e.g. "/de/cart.js").
   getCart(options) {
     if (options == null) { options = {}; }
     options.type = 'GET';
     options.updateCart = true;
-    return CartJS.Queue.add('/cart.js', {v: new Date().getTime()}, options);
+    return CartJS.Queue.add(CartJS.Utils.getUrl('cart.js'), {v: new Date().getTime()}, options);
   },
 
   // Add a new line item to the cart.
@@ -480,7 +493,7 @@ CartJS.Core = {
     const data = CartJS.Utils.wrapKeys(properties, null, null, ['selling_plan']);
     data.id = id;
     data.quantity = quantity;
-    CartJS.Queue.add('/cart/add.js', data, options);
+    CartJS.Queue.add(CartJS.Utils.getUrl('cart/add.js'), data, options);
     return CartJS.Core.getCart();
   },
 
@@ -489,7 +502,7 @@ CartJS.Core = {
     if (options == null) { options = {}; }
     const data =
       {items};
-    CartJS.Queue.add('/cart/add.js', data, options);
+    CartJS.Queue.add(CartJS.Utils.getUrl('cart/add.js'), data, options);
     return CartJS.Core.getCart();
   },
 
@@ -503,7 +516,7 @@ CartJS.Core = {
       data.quantity = quantity;
     }
     options.updateCart = true;
-    return CartJS.Queue.add('/cart/change.js', data, options);
+    return CartJS.Queue.add(CartJS.Utils.getUrl('cart/change.js'), data, options);
   },
 
   // Remove an existing line item.
@@ -522,7 +535,7 @@ CartJS.Core = {
       data.quantity = quantity;
     }
     options.updateCart = true;
-    return CartJS.Queue.add('/cart/change.js', data, options);
+    return CartJS.Queue.add(CartJS.Utils.getUrl('cart/change.js'), data, options);
   },
 
   // Set the quantities of a number of items in the cart with an ID/Quantity "updates" mapping.
@@ -530,7 +543,7 @@ CartJS.Core = {
     if (updates == null) { updates = {}; }
     if (options == null) { options = {}; }
     options.updateCart = true;
-    return CartJS.Queue.add('/cart/update.js', {updates}, options);
+    return CartJS.Queue.add(CartJS.Utils.getUrl('cart/update.js'), {updates}, options);
   },
 
   // Remove all line items for the given variant ID.
@@ -541,14 +554,14 @@ CartJS.Core = {
       quantity: 0
     };
     options.updateCart = true;
-    return CartJS.Queue.add('/cart/change.js', data, options);
+    return CartJS.Queue.add(CartJS.Utils.getUrl('cart/change.js'), data, options);
   },
 
   // Clear all items from the cart.
   clear(options) {
     if (options == null) { options = {}; }
     options.updateCart = true;
-    return CartJS.Queue.add('/cart/clear.js', {}, options);
+    return CartJS.Queue.add(CartJS.Utils.getUrl('cart/clear.js'), {}, options);
   },
 
   // Get a cart attribute.
@@ -574,14 +587,14 @@ CartJS.Core = {
     if (attributes == null) { attributes = {}; }
     if (options == null) { options = {}; }
     options.updateCart = true;
-    return CartJS.Queue.add('/cart/update.js', CartJS.Utils.wrapKeys(attributes, 'attributes'), options);
+    return CartJS.Queue.add(CartJS.Utils.getUrl('cart/update.js'), CartJS.Utils.wrapKeys(attributes, 'attributes'), options);
   },
 
   // Clear all attributes.
   clearAttributes(options) {
     if (options == null) { options = {}; }
     options.updateCart = true;
-    return CartJS.Queue.add('/cart/update.js', CartJS.Utils.wrapKeys(CartJS.Core.getAttributes(), 'attributes', ''), options);
+    return CartJS.Queue.add(CartJS.Utils.getUrl('cart/update.js'), CartJS.Utils.wrapKeys(CartJS.Core.getAttributes(), 'attributes', ''), options);
   },
 
   // Get the cart note.
@@ -593,7 +606,7 @@ CartJS.Core = {
   setNote(note, options) {
     if (options == null) { options = {}; }
     options.updateCart = true;
-    return CartJS.Queue.add('/cart/update.js', { note }, options);
+    return CartJS.Queue.add(CartJS.Utils.getUrl('cart/update.js'), { note }, options);
   }
 };
 ;
@@ -605,6 +618,7 @@ CartJS.Core = {
  */
 // CartJS.Data
 // Data API for CartJS.
+// Uses mepto (preferred) with graceful fallback to jQuery via mepto-adapter
 // --------------------
 
 // Reference to the document element.
@@ -614,7 +628,7 @@ CartJS.Data = {
 
   // Initialise the Data API.
   init() {
-    $document = jQuery(document);
+    $document = mepto(document);
     CartJS.Data.setEventListeners('on');
     return CartJS.Data.render(null, CartJS.cart);
   },
@@ -644,7 +658,7 @@ CartJS.Data = {
   // Handler for [data-cart-add] click events.
   add(e) {
     e.preventDefault();
-    const $this = jQuery(this);
+    const $this = mepto(this);
     const properties = {};
     properties.selling_plan = $this.attr('data-cart-selling-plan');
     return CartJS.Core.addItem($this.attr('data-cart-add'), $this.attr('data-cart-quantity'), properties);
@@ -653,21 +667,21 @@ CartJS.Data = {
   // Handler for [data-cart-remove] click events.
   remove(e) {
     e.preventDefault();
-    const $this = jQuery(this);
+    const $this = mepto(this);
     return CartJS.Core.removeItem($this.attr('data-cart-remove'));
   },
 
   // Handler for [data-cart-remove-id] click events.
   removeById(e) {
     e.preventDefault();
-    const $this = jQuery(this);
+    const $this = mepto(this);
     return CartJS.Core.removeItemById($this.attr('data-cart-remove-id'));
   },
 
   // Handler for [data-cart-update] click events.
   update(e) {
     e.preventDefault();
-    const $this = jQuery(this);
+    const $this = mepto(this);
     const properties = {};
     properties.selling_plan = $this.attr('data-cart-selling-plan');
     return CartJS.Core.updateItem($this.attr('data-cart-update'), $this.attr('data-cart-quantity'), properties);
@@ -676,7 +690,7 @@ CartJS.Data = {
   // Handler for [data-cart-update-id] click events.
   updateById(e) {
     e.preventDefault();
-    const $this = jQuery(this);
+    const $this = mepto(this);
     const properties = {};
     properties.selling_plan = $this.attr('data-cart-selling-plan');
     return CartJS.Core.updateItemById($this.attr('data-cart-update-id'), $this.attr('data-cart-quantity'), properties);
@@ -690,7 +704,7 @@ CartJS.Data = {
 
   // Handler for [data-cart-toggle] change events.
   toggle(e) {
-    const $input = jQuery(this);
+    const $input = mepto(this);
     const id = $input.attr('data-cart-toggle');
     if ($input.is(':checked')) {
       return CartJS.Core.addItem(id);
@@ -701,7 +715,7 @@ CartJS.Data = {
 
   // Handler for [data-cart-toggle-attribute] change events.
   toggleAttribute(e) {
-    const $input = jQuery(this);
+    const $input = mepto(this);
     const attribute = $input.attr('data-cart-toggle-attribute');
     return CartJS.Core.setAttribute(attribute, $input.is(':checked') ? 'Yes' : '');
   },
@@ -710,12 +724,12 @@ CartJS.Data = {
   submit(e) {
     e.preventDefault();
 
-    const dataArray = jQuery(this).serializeArray();
+    const dataArray = mepto(this).serializeArray();
 
     let id = undefined;
     let quantity = undefined;
     const properties = {};
-    jQuery.each(dataArray, function(i, item) {
+    mepto.each(dataArray, function(i, item) {
       if (item.name === 'id') {
         return id = item.value;
       } else if (item.name === 'quantity') {
@@ -741,8 +755,8 @@ CartJS.Data = {
     };
 
     // Render the context to elements as needed.
-    return jQuery('[data-cart-render]').each(function(){
-      const $this = jQuery(this);
+    return mepto('[data-cart-render]').each(function(){
+      const $this = mepto(this);
       return $this.html(context[$this.attr('data-cart-render')]);});
   }
 };
@@ -815,8 +829,8 @@ if (_bindingEngine != null) {
       }
 
       // Iterate through and bind all elements marked as views via the [data-cart-view] attribute.
-      return jQuery('[data-cart-view]').each(function() {
-        const view = _bindingEngine.bind(jQuery(this), CartJS.Rivets.model);
+      return mepto('[data-cart-view]').each(function() {
+        const view = _bindingEngine.bind(mepto(this), CartJS.Rivets.model);
         return CartJS.Rivets.boundViews.push(view);
       });
     },

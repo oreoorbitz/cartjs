@@ -5,6 +5,13 @@
   "author": "Gavin Ballard",
   "url": "https://cartjs.org",
   "main": "./dist/cart.js",
+  "module": "./dist/cart.js",
+  "exports": {
+    ".": {
+      "import": "./dist/cart.js",
+      "require": "./dist/cart.js"
+    }
+  },
   "licenses": [
     {
       "type": "MIT",

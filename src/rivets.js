@@ -66,8 +66,8 @@ if (_bindingEngine != null) {
       }
 
       // Iterate through and bind all elements marked as views via the [data-cart-view] attribute.
-      return jQuery('[data-cart-view]').each(function() {
-        const view = _bindingEngine.bind(jQuery(this), CartJS.Rivets.model);
+      return mepto('[data-cart-view]').each(function() {
+        const view = _bindingEngine.bind(mepto(this), CartJS.Rivets.model);
         return CartJS.Rivets.boundViews.push(view);
       });
     },

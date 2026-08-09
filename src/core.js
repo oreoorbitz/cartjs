@@ -11,11 +11,12 @@
 CartJS.Core = {
 
   // Fetch updated cart object from API endpoint.
+  // Uses window.Shopify.routes.root for locale-aware URLs (e.g. "/de/cart.js").
   getCart(options) {
     if (options == null) { options = {}; }
     options.type = 'GET';
     options.updateCart = true;
-    return CartJS.Queue.add('/cart.js', {v: new Date().getTime()}, options);
+    return CartJS.Queue.add(CartJS.Utils.getUrl('cart.js'), {v: new Date().getTime()}, options);
   },
 
   // Add a new line item to the cart.
@@ -26,7 +27,7 @@ CartJS.Core = {
     const data = CartJS.Utils.wrapKeys(properties, null, null, ['selling_plan']);
     data.id = id;
     data.quantity = quantity;
-    CartJS.Queue.add('/cart/add.js', data, options);
+    CartJS.Queue.add(CartJS.Utils.getUrl('cart/add.js'), data, options);
     return CartJS.Core.getCart();
   },
 
@@ -35,7 +36,7 @@ CartJS.Core = {
     if (options == null) { options = {}; }
     const data =
       {items};
-    CartJS.Queue.add('/cart/add.js', data, options);
+    CartJS.Queue.add(CartJS.Utils.getUrl('cart/add.js'), data, options);
     return CartJS.Core.getCart();
   },
 
@@ -49,7 +50,7 @@ CartJS.Core = {
       data.quantity = quantity;
     }
     options.updateCart = true;
-    return CartJS.Queue.add('/cart/change.js', data, options);
+    return CartJS.Queue.add(CartJS.Utils.getUrl('cart/change.js'), data, options);
   },
 
   // Remove an existing line item.
@@ -68,7 +69,7 @@ CartJS.Core = {
       data.quantity = quantity;
     }
     options.updateCart = true;
-    return CartJS.Queue.add('/cart/change.js', data, options);
+    return CartJS.Queue.add(CartJS.Utils.getUrl('cart/change.js'), data, options);
   },
 
   // Set the quantities of a number of items in the cart with an ID/Quantity "updates" mapping.
@@ -76,7 +77,7 @@ CartJS.Core = {
     if (updates == null) { updates = {}; }
     if (options == null) { options = {}; }
     options.updateCart = true;
-    return CartJS.Queue.add('/cart/update.js', {updates}, options);
+    return CartJS.Queue.add(CartJS.Utils.getUrl('cart/update.js'), {updates}, options);
   },
 
   // Remove all line items for the given variant ID.
@@ -87,14 +88,14 @@ CartJS.Core = {
       quantity: 0
     };
     options.updateCart = true;
-    return CartJS.Queue.add('/cart/change.js', data, options);
+    return CartJS.Queue.add(CartJS.Utils.getUrl('cart/change.js'), data, options);
   },
 
   // Clear all items from the cart.
   clear(options) {
     if (options == null) { options = {}; }
     options.updateCart = true;
-    return CartJS.Queue.add('/cart/clear.js', {}, options);
+    return CartJS.Queue.add(CartJS.Utils.getUrl('cart/clear.js'), {}, options);
   },
 
   // Get a cart attribute.
@@ -120,14 +121,14 @@ CartJS.Core = {
     if (attributes == null) { attributes = {}; }
     if (options == null) { options = {}; }
     options.updateCart = true;
-    return CartJS.Queue.add('/cart/update.js', CartJS.Utils.wrapKeys(attributes, 'attributes'), options);
+    return CartJS.Queue.add(CartJS.Utils.getUrl('cart/update.js'), CartJS.Utils.wrapKeys(attributes, 'attributes'), options);
   },
 
   // Clear all attributes.
   clearAttributes(options) {
     if (options == null) { options = {}; }
     options.updateCart = true;
-    return CartJS.Queue.add('/cart/update.js', CartJS.Utils.wrapKeys(CartJS.Core.getAttributes(), 'attributes', ''), options);
+    return CartJS.Queue.add(CartJS.Utils.getUrl('cart/update.js'), CartJS.Utils.wrapKeys(CartJS.Core.getAttributes(), 'attributes', ''), options);
   },
 
   // Get the cart note.
@@ -139,6 +140,6 @@ CartJS.Core = {
   setNote(note, options) {
     if (options == null) { options = {}; }
     options.updateCart = true;
-    return CartJS.Queue.add('/cart/update.js', { note }, options);
+    return CartJS.Queue.add(CartJS.Utils.getUrl('cart/update.js'), { note }, options);
   }
 };

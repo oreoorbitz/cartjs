@@ -1,65 +1,67 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- */
-// CartJS Mepto Adapter
-// Ensures window.jQuery, window.$, window.mepto are strict === for drop-in.
-// Prefers Mepto (meptos) with jQuery fallback. For themes that already load jQuery, keep it.
+// CartJS Mepto Adapter — graceful fallback, not bundled
+// Resolves adapter at runtime: prefers window.mepto, falls back to window.jQuery/window.$
+// Ensures window.mepto, window.jQuery, window.$ are strict === for drop-in
+// dist/cart.js remains external: theme loads mepto or jQuery separately via <script> tag
 
-(function() {
+(function () {
   var adapter = null;
+  var hasWindow = typeof window !== 'undefined';
 
-  // Try to resolve Mepto from globals first (browser UMD)
-  if (typeof window !== 'undefined') {
+  // 1. Prefer mepto already on page (theme loaded meptos.min.js)
+  if (hasWindow) {
     if (window.mepto) {
       adapter = window.mepto;
     } else if (window.$ && window.$.mepto) {
-      // Mepto may set $ with mepto flag
+      // Mepto may expose itself as $
       adapter = window.$;
     } else if (window.jQuery) {
+      // Graceful fallback: jQuery present (legacy theme)
       adapter = window.jQuery;
+    } else if (window.$) {
+      adapter = window.$;
     }
   }
 
-  // Try CommonJS require if not in browser (Node, bundler)
+  // 2. Node / bundler fallback (Vitest happy-dom, build)
   if (!adapter) {
     try {
       var meptos = require('meptos');
-      if (meptos && meptos.$) {
-        adapter = meptos.$;
-      } else if (meptos && meptos.mepto) {
-        adapter = meptos.mepto;
-      } else {
-        adapter = meptos;
-      }
+      if (meptos && meptos.$) adapter = meptos.$;
+      else if (meptos && meptos.mepto) adapter = meptos.mepto;
+      else adapter = meptos;
     } catch (e) {
-      // no meptos in Node, fallback to jquery if available
       try {
         adapter = require('jquery');
       } catch (e2) {}
     }
   }
 
-  // Alias for drop-in: all three globals strict ===
-  if (typeof window !== 'undefined' && adapter) {
-    // Prefer Mepto if both exist — Mepto is the modern path
-    var preferred = null;
-    if (window.mepto) {
-      preferred = window.mepto;
-    } else if (adapter && adapter.mepto) {
-      preferred = adapter;
-    } else {
-      preferred = adapter;
-    }
-    // Ensure all globals point to same object
+  // 3. Alias all globals to same object so existing theme code
+  //    `jQuery(document).on('cart.requestComplete', ...)` keeps working
+  //    whether theme loaded mepto or jQuery
+  if (hasWindow && adapter) {
+    var preferred = window.mepto || adapter;
+    // If both mepto and jQuery exist, prefer mepto (modern path)
+    if (window.mepto && window.mepto.mepto) preferred = window.mepto;
+    else if (adapter && adapter.mepto) preferred = adapter;
+
+    window.mepto = preferred;
     window.jQuery = preferred;
     window.$ = preferred;
-    window.mepto = preferred;
-    // Also expose as globals for Node-like env
+
     if (typeof global !== 'undefined') {
+      global.mepto = preferred;
       global.jQuery = preferred;
       global.$ = preferred;
-      global.mepto = preferred;
+    }
+  } else if (typeof global !== 'undefined' && adapter) {
+    global.mepto = adapter;
+    global.jQuery = adapter;
+    global.$ = adapter;
+    if (hasWindow) {
+      window.mepto = adapter;
+      window.jQuery = adapter;
+      window.$ = adapter;
     }
   }
 })();

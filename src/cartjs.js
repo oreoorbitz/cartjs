@@ -55,15 +55,15 @@ CartJS.init = function(cart, settings) {
   // Set up toggling of CSS class on body during requests if provided.
   if (CartJS.settings.requestBodyClass) {
     CartJS.Utils.log('"requestBodyClass" set, adding event listeners.');
-    jQuery(document).on('cart.requestStarted', () => jQuery('body').addClass(CartJS.settings.requestBodyClass));
-    jQuery(document).on('cart.requestComplete', () => jQuery('body').removeClass(CartJS.settings.requestBodyClass));
+    mepto(document).on('cart.requestStarted', () => mepto('body').addClass(CartJS.settings.requestBodyClass));
+    mepto(document).on('cart.requestComplete', () => mepto('body').removeClass(CartJS.settings.requestBodyClass));
   }
 
   // Initialise DOM Binding through Rivets module.
   // Performs a no-op if Rivets.js isn't present.
   CartJS.Rivets.init();
 
-  return jQuery(document).trigger('cart.ready', [CartJS.cart]);
+  return mepto(document).trigger('cart.ready', [CartJS.cart]);
 };
 
 // Configure CartJS with the given settings object.

@@ -40,7 +40,7 @@ CartJS.Queue = {
     if (processing) { return; }
 
     // Start processing.
-    jQuery(document).trigger('cart.requestStarted', [CartJS.cart]);
+    mepto(document).trigger('cart.requestStarted', [CartJS.cart]);
     return CartJS.Queue.process();
   },
 
@@ -48,13 +48,13 @@ CartJS.Queue = {
   process() {
     if (!queue.length) {
       processing = false;
-      jQuery(document).trigger('cart.requestComplete', [CartJS.cart]);
+      mepto(document).trigger('cart.requestComplete', [CartJS.cart]);
       return;
     }
 
     processing = true;
     const params = queue.shift();
     params.complete = CartJS.Queue.process;
-    return jQuery.ajax(params);
+    return mepto.ajax(params);
   }
 };

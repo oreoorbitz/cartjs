@@ -6,6 +6,7 @@
  */
 // CartJS.Data
 // Data API for CartJS.
+// Uses mepto (preferred) with graceful fallback to jQuery via mepto-adapter
 // --------------------
 
 // Reference to the document element.
@@ -15,7 +16,7 @@ CartJS.Data = {
 
   // Initialise the Data API.
   init() {
-    $document = jQuery(document);
+    $document = mepto(document);
     CartJS.Data.setEventListeners('on');
     return CartJS.Data.render(null, CartJS.cart);
   },
@@ -45,7 +46,7 @@ CartJS.Data = {
   // Handler for [data-cart-add] click events.
   add(e) {
     e.preventDefault();
-    const $this = jQuery(this);
+    const $this = mepto(this);
     const properties = {};
     properties.selling_plan = $this.attr('data-cart-selling-plan');
     return CartJS.Core.addItem($this.attr('data-cart-add'), $this.attr('data-cart-quantity'), properties);
@@ -54,21 +55,21 @@ CartJS.Data = {
   // Handler for [data-cart-remove] click events.
   remove(e) {
     e.preventDefault();
-    const $this = jQuery(this);
+    const $this = mepto(this);
     return CartJS.Core.removeItem($this.attr('data-cart-remove'));
   },
 
   // Handler for [data-cart-remove-id] click events.
   removeById(e) {
     e.preventDefault();
-    const $this = jQuery(this);
+    const $this = mepto(this);
     return CartJS.Core.removeItemById($this.attr('data-cart-remove-id'));
   },
 
   // Handler for [data-cart-update] click events.
   update(e) {
     e.preventDefault();
-    const $this = jQuery(this);
+    const $this = mepto(this);
     const properties = {};
     properties.selling_plan = $this.attr('data-cart-selling-plan');
     return CartJS.Core.updateItem($this.attr('data-cart-update'), $this.attr('data-cart-quantity'), properties);
@@ -77,7 +78,7 @@ CartJS.Data = {
   // Handler for [data-cart-update-id] click events.
   updateById(e) {
     e.preventDefault();
-    const $this = jQuery(this);
+    const $this = mepto(this);
     const properties = {};
     properties.selling_plan = $this.attr('data-cart-selling-plan');
     return CartJS.Core.updateItemById($this.attr('data-cart-update-id'), $this.attr('data-cart-quantity'), properties);
@@ -91,7 +92,7 @@ CartJS.Data = {
 
   // Handler for [data-cart-toggle] change events.
   toggle(e) {
-    const $input = jQuery(this);
+    const $input = mepto(this);
     const id = $input.attr('data-cart-toggle');
     if ($input.is(':checked')) {
       return CartJS.Core.addItem(id);
@@ -102,7 +103,7 @@ CartJS.Data = {
 
   // Handler for [data-cart-toggle-attribute] change events.
   toggleAttribute(e) {
-    const $input = jQuery(this);
+    const $input = mepto(this);
     const attribute = $input.attr('data-cart-toggle-attribute');
     return CartJS.Core.setAttribute(attribute, $input.is(':checked') ? 'Yes' : '');
   },
@@ -111,12 +112,12 @@ CartJS.Data = {
   submit(e) {
     e.preventDefault();
 
-    const dataArray = jQuery(this).serializeArray();
+    const dataArray = mepto(this).serializeArray();
 
     let id = undefined;
     let quantity = undefined;
     const properties = {};
-    jQuery.each(dataArray, function(i, item) {
+    mepto.each(dataArray, function(i, item) {
       if (item.name === 'id') {
         return id = item.value;
       } else if (item.name === 'quantity') {
@@ -142,8 +143,8 @@ CartJS.Data = {
     };
 
     // Render the context to elements as needed.
-    return jQuery('[data-cart-render]').each(function(){
-      const $this = jQuery(this);
+    return mepto('[data-cart-render]').each(function(){
+      const $this = mepto(this);
       return $this.html(context[$this.attr('data-cart-render')]);});
   }
 };
