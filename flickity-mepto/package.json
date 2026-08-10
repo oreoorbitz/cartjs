@@ -1,0 +1,27 @@
+{
+  "name": "flickity-mepto",
+  "version": "2.3.0-mepto.1",
+  "description": "Flickity 2.3.0 — Mepto-integrated, jQuery-free carousel. Drop-in, same Flickity API.",
+  "type": "module",
+  "main": "dist/flickity.pkgd.js",
+  "module": "dist/flickity.esm.js",
+  "style": "dist/flickity.min.css",
+  "files": ["dist", "src", "css", "README.md"],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch"
+  },
+  "peerDependencies": {
+    "meptos": ">=2.0.0"
+  },
+  "dependencies": {
+    "desandro-matches-selector": "^2.0.0",
+    "ev-emitter": "^1.1.1",
+    "fizzy-ui-utils": "^2.0.7",
+    "get-size": "^2.0.3",
+    "unidragger": "^2.4.0",
+    "unipointer": "^2.4.0"
+  },
+  "license": "GPL-3.0-or-Commercial",
+  "author": "Metafizzy (upstream) + oreoorbitz/flickity-mepto (mepto port)"
+}
