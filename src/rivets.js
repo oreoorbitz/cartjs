@@ -66,8 +66,10 @@ if (_bindingEngine != null) {
       }
 
       // Iterate through and bind all elements marked as views via the [data-cart-view] attribute.
+      // Pass raw DOM element (this) — Tinybind View checks els.jquery; with Mepto
+      // that now passes, but raw element is canonical and avoids wrapper overhead.
       return mepto('[data-cart-view]').each(function() {
-        const view = _bindingEngine.bind(mepto(this), CartJS.Rivets.model);
+        const view = _bindingEngine.bind(this, CartJS.Rivets.model);
         return CartJS.Rivets.boundViews.push(view);
       });
     },
